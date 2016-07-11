@@ -1,16 +1,14 @@
-# This class installs latest ssh server (though it almost always is already)
+# This class installs latest ssh server and ensures it is running
 # Also triggers edits the config files per stanzas in hiera using augeas
 class ssh(
   $sshd_config  = {},
   $ssh_config   = {},
   $install_mosh = true,
 ) {
-  #require base  # doesn't actually require the base for anything
-
   # put this in a params class?  is that still a thing done with puppet?
   #  $package     = $ssh::params::package,
   #  $service     = $ssh::params::service,
-  # i only use RHEL-clones and Ubuntu LTS at the moment
+  # only support RHEL-clones and Ubuntu LTS at the moment
   case $::osfamily {
     'Debian': {
       $package = 'openssh-server'
@@ -27,13 +25,15 @@ class ssh(
     }
   }
 
-  package { $package:
+  package { 'openssh-server':
+    name    => $package
     ensure  => 'latest',
   }
-  service { $service:
+  service { 'sshd':
+    name    => $service,
     ensure  => 'running',
     enable  => true,
-    require => Package[$package]
+    require => Package['openssh-server']
   }
 
   # these pull hash from hiera and dump it into augeas to edit config files

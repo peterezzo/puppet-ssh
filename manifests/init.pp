@@ -1,8 +1,8 @@
 # This class installs latest ssh server and ensures it is running
 # Also triggers edits the config files per stanzas in hiera using augeas
+# these stanzas MUST be defined in hiera and are merged from multiple levels
+# with hiera_hash call, not overwritten by most specific
 class ssh(
-  $sshd_config  = {},
-  $ssh_config   = {},
   $install_mosh = true,
 ) {
   # put this in a params class?  is that still a thing done with puppet?
@@ -38,6 +38,8 @@ class ssh(
 
   # these pull hash from hiera and dump it into augeas to edit config files
   # augeas will handle restart of sshd if file is updated
+  $sshd_config = hiera_hash("${module_name}::sshd_config",{})
+  $ssh_config = hiera_hash("${module_name}::ssh_config",{})
   create_resources(sshd_config, $sshd_config)
   create_resources(ssh_config, $ssh_config)
 

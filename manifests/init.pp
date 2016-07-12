@@ -26,7 +26,7 @@ class ssh(
   }
 
   package { 'openssh-server':
-    name    => $package
+    name    => $package,
     ensure  => 'latest',
   }
   service { 'sshd':

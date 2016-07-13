@@ -28,12 +28,12 @@ class ssh(
   }
 
   package { 'openssh-server':
-    name    => $package,
-    ensure  => 'latest',
+    ensure => 'latest',
+    name   => $package,
   }
   service { 'sshd':
-    name    => $service,
     ensure  => 'running',
+    name    => $service,
     enable  => true,
     require => Package['openssh-server']
   }

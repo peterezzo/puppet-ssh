@@ -5,6 +5,8 @@
 class ssh(
   $install_mosh = true,
 ) {
+  require base  # dns/proxy setup in base
+
   # put this in a params class?  is that still a thing done with puppet?
   #  $package     = $ssh::params::package,
   #  $service     = $ssh::params::service,

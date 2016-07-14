@@ -46,7 +46,7 @@ class ssh(
   create_resources(ssh_config, $ssh_config)
 
   # install mosh by default for more robust ssh
-  if install_mosh {
+  if $install_mosh {
     package { $mosh:
       ensure => 'latest',
     }

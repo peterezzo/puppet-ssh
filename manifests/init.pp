@@ -2,12 +2,13 @@
 # Also triggers edits the config files per stanzas in hiera using augeas
 # these stanzas MUST be defined in hiera and are merged from multiple levels
 # with hiera_hash call, not overwritten by most specific
+# configure_sudo - install a file to use user's ssh agent via sudo
+# install_mosh - install the mosh client as well as ssh
 class ssh(
-  $install_mosh = true,
+  $install_mosh      = true,
+  $configure_sudo    = true,
+  $file_sudoenv_path = '/etc/sudoers.d/ssh_agent'
 ) {
-  require base  # dns/proxy setup in base
-
-  # put this in a params class?  is that still a thing done with puppet?
   #  $package     = $ssh::params::package,
   #  $service     = $ssh::params::service,
   # only support RHEL-clones and Ubuntu LTS at the moment
@@ -28,22 +29,32 @@ class ssh(
   }
 
   package { 'openssh-server':
-    ensure => 'latest',
-    name   => $package,
+    name    => $package,
+    ensure  => 'latest',
   }
   service { 'sshd':
-    ensure  => 'running',
     name    => $service,
+    ensure  => 'running',
     enable  => true,
     require => Package['openssh-server']
   }
 
   # these pull hash from hiera and dump it into augeas to edit config files
   # augeas will handle restart of sshd if file is updated
+  # TODO: make hiera optional
   $sshd_config = hiera_hash("${module_name}::sshd_config",{})
-  $ssh_config = hiera_hash("${module_name}::ssh_config",{})
   create_resources(sshd_config, $sshd_config)
+  $ssh_config = hiera_hash("${module_name}::ssh_config",{})
   create_resources(ssh_config, $ssh_config)
+
+  # make sudo push work
+  if $configure_sudo {
+    file { $file_sudoenv_path:
+      ensure => present,
+      mode   => '0440',
+      source => "puppet:///modules/${module_name}/sudoers-ssh_agent"
+    }
+  }
 
   # install mosh by default for more robust ssh
   if $install_mosh {

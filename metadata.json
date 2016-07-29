@@ -1,0 +1,25 @@
+{
+  "name": "peterezzo-ssh",
+  "version": "0.0.1",
+  "summary": "Puppet module for openssh",
+  "author": "Pete Ezzo",
+  "description": "This module installs and configures openssh at the system level",
+  "dependencies": [
+    { "name": "herculesteam/augeasproviders_ssh", "version_requirement": ">= 2.5.0 < 3.0.0" }
+  ],
+  "checksums": {
+
+  },
+  "operatingsystem_support": [
+    {
+      "operatingsystem":"RedHat",
+      "operatingsystemrelease":[ "7.0" ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [ "14.04" ]
+    }
+   ],
+  "source": "https://github.com/peterezzo/lab-puppet",
+  "license": "None"
+}

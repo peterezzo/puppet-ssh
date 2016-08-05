@@ -3,9 +3,7 @@
 # these stanzas MUST be defined in hiera and are merged from multiple levels
 # with hiera_hash call, not overwritten by most specific
 # configure_sudo - install a file to use user's ssh agent via sudo
-# install_mosh - install the mosh client as well as ssh
 class ssh(
-  $install_mosh      = true,
   $configure_sudo    = true,
   $file_sudoenv_path = '/etc/sudoers.d/ssh_agent'
 ) {
@@ -16,12 +14,10 @@ class ssh(
     'Debian': {
       $package = 'openssh-server'
       $service = 'ssh'
-      $mosh    = 'mosh'
     }
     'RedHat': {
       $package = 'openssh-server'
       $service = 'sshd'
-      $mosh    = 'mosh'
     }
     default: {
       fail("The ${module_name} module is not supported on an ${::osfamily} based system.")
@@ -53,13 +49,6 @@ class ssh(
       ensure => present,
       mode   => '0440',
       source => "puppet:///modules/${module_name}/sudoers-ssh_agent"
-    }
-  }
-
-  # install mosh by default for more robust ssh
-  if $install_mosh {
-    package { $mosh:
-      ensure => 'latest',
     }
   }
 }
